@@ -2986,7 +2986,14 @@ public abstract class AbstractJdbc2ResultSet implements BaseResultSet, org.postg
      * @return True if the column is in binary format.
      */
     protected boolean isBinary(int column) {
-        return fields[column - 1].getFormat() == Field.BINARY_FORMAT;
+        Field f = fields[column - 1];
+        if (f.getPGType().equalsIgnoreCase("timestamptz") || f.getPGType().equalsIgnoreCase("timetz")) {
+            // Prevent binary treating of fields with timezone.
+            return false;
+        }
+        else {
+            return fields[column - 1].getFormat() == Field.BINARY_FORMAT;
+        }
     }
 
     //----------------- Formatting Methods -------------------
